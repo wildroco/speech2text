@@ -36,8 +36,6 @@ private const val MESSAGE_RECORDING = "녹음중..."
 private const val MESSAGE_RECOGNIZING = "음성 인식중..."
 
 class MainActivity : AppCompatActivity() {
-
-
     //녹음 기능을 사용하기 위한 권한 획득을 위한 변수
     private var permissionToRecordAccepted = false
     private var permissions: Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
@@ -88,6 +86,7 @@ class MainActivity : AppCompatActivity() {
 
     // Android 기본 제공 메서드. Activity가 생성 될 때 해야 할 일
     override fun onCreate(savedInstanceState: Bundle?) {
+        // UI 구성하기
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
@@ -97,15 +96,17 @@ class MainActivity : AppCompatActivity() {
         textViewResult?.text = ""
         actionButton = findViewById(R.id.fab)
 
+        // 녹음 권한 요청
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
 
-
+        // 녹음 버튼 행동 설정
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
             when (state) {
                 STATE_READY -> onStartRecording()
                 STATE_RECORDING -> onStopRecording()
                 STATE_RECOGNIZING -> {
                     Log.d(TAG, "음성 인식 중 버튼 눌림. 이 행동은 막아야 함")
+                    Toast.makeText(baseContext, "음성 인식 진행중 입니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -121,6 +122,8 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_share -> {
+                // 공유 메뉴 행동 정의
+
                 if (textViewResult?.text.isNullOrEmpty()) {
                     Toast.makeText(baseContext, "음성 인식 결과가 없습니다.", Toast.LENGTH_SHORT).show()
                 } else {
@@ -148,9 +151,24 @@ class MainActivity : AppCompatActivity() {
             textViewResult?.text = ""
 
             Thread {
-                Log.d(TAG, "onRecordingStart")
+                // 레코딩 시작
+                Log.d(TAG, "record start")
                 recordSpeech()
-                recognizeVoice()
+
+                // 음성 인식 시작
+                Log.d(TAG, "regognize start")
+                state = STATE_RECOGNIZING
+                mainHandler.post {
+                    textViewState?.text = MESSAGE_RECOGNIZING
+                }
+                var recognizedText = recognizeVoice()
+                if (recognizedText.isNullOrEmpty()) {
+                    recognizedText = "음성 인식 실패"
+                }
+                mainHandler.post {
+                    textViewResult?.text = recognizedText
+                    onReady()
+                }
             }.start()
         }
     }
@@ -216,13 +234,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 음성 인식하기.
-    private fun recognizeVoice() {
+    private fun recognizeVoice(): String? {
         Log.d(TAG, "recognizeVoice")
-        state = STATE_RECOGNIZING
-        mainHandler.post {
-            textViewState?.text = MESSAGE_RECOGNIZING
-        }
-
         val audioString = Base64.encodeToString(speechData, 0, speechLength * 2, Base64.NO_WRAP)
         val requestBody = VoiceRecognitionRequest(
             request_id = UUID.randomUUID().toString(),
@@ -233,29 +246,16 @@ class MainActivity : AppCompatActivity() {
             )
         )
         val request = etriService.voiceRecognition(requestBody)
-        request.enqueue(object : Callback<VoiceRecognitionResponse> {
-            override fun onResponse(
-                call: Call<VoiceRecognitionResponse>,
-                response: Response<VoiceRecognitionResponse>
-            ) {
-                Log.d(TAG, "success code: ${response.code()}")
-                Log.d(TAG, "success message: ${response.message()}")
-                Log.d(TAG, "success error body: ${response.errorBody()?.string()}")
-                Log.d(TAG, "success body: ${response.body()}")
-                val recognizedText = response.body()?.return_object?.recognized ?: ""
-                mainHandler.post {
-                    textViewResult?.text = recognizedText
-                    onReady()
-                }
-            }
-
-            override fun onFailure(call: Call<VoiceRecognitionResponse>, t: Throwable) {
-                Log.e(TAG, "failed", t)
-                mainHandler.post {
-                    textViewResult?.text = "음성 인식 실패"
-                    onReady()
-                }
-            }
-        })
+        val response = request.execute()
+        Log.d(TAG, "response code: ${response.code()}")
+        Log.d(TAG, "response message: ${response.message()}")
+        Log.d(TAG, "response body: ${response.body()}")
+        Log.d(TAG, "response error body: ${response.errorBody()?.string()}")
+        if (response.isSuccessful) {
+            val recognizedText = response.body()?.return_object?.recognized ?: ""
+            return recognizedText
+        } else {
+            return null
+        }
     }
 }
