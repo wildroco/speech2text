@@ -8,11 +8,9 @@ AI 음성 인식 안드로이드 앱
 - Android 21+
 - Kotlin 1.4.32
 
-## API Key
-```text
-a674ff10-4c3e-4aa4-843a-1a61a7e8293b
-```
-교육 이후 폐기 예정
+## 강의 자료
+### 개발환경 구축 안내 문서
+[경기디지털사회혁신센터 데이터기술전문가교육 앱개발 - 개발환경구축.pdf](https://drive.google.com/file/d/1xnSg3mTYVDr96yUCrYBfiYtCMviLFUPF/view?usp=sharing)
 
 
 ## 참고문헌
