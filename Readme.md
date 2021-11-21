@@ -12,6 +12,9 @@ AI 음성 인식 안드로이드 앱
 ### 개발환경 구축 안내 문서
 [경기디지털사회혁신센터 데이터기술전문가교육 앱개발 - 개발환경구축.pdf](https://drive.google.com/file/d/1xnSg3mTYVDr96yUCrYBfiYtCMviLFUPF/view?usp=sharing)
 
+### 강의 슬라이드
+
+
 
 ## 참고문헌
 - ETRI 인공지능 오픈 API 포털: https://aiopen.etri.re.kr/
