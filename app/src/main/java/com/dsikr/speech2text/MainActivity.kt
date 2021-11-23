@@ -68,194 +68,209 @@ class MainActivity : AppCompatActivity() {
     private var speechData = ByteArray(speechMaxLength * 2)
 
 
-    //Android 기본 제공 메서드. 녹음 기능 권한 획득의 결과를 처리하는 콜백
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionToRecordAccepted = if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
-            grantResults[0] == PackageManager.PERMISSION_GRANTED
-        } else {
-            false
-        }
-        if (!permissionToRecordAccepted) finish()
-    }
-
-
     // Android 기본 제공 메서드. Activity가 생성 될 때 해야 할 일
     override fun onCreate(savedInstanceState: Bundle?) {
-        // UI 구성하기
         super.onCreate(savedInstanceState)
+        showMessage("onCreate")
+
+        // UI 구성하기
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
-        textViewState = findViewById(R.id.textview_state)
-        textViewState?.text = MESSAGE_READY
-        textViewResult = findViewById(R.id.textview_result)
-        textViewResult?.text = ""
-        actionButton = findViewById(R.id.fab)
 
         // 녹음 권한 요청
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
+//        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
+
+        // UI 요소 가져와 선언하기
+//        textViewState = findViewById(R.id.textview_state)
+//        textViewState?.text = MESSAGE_READY
+//        textViewResult = findViewById(R.id.textview_result)
+//        textViewResult?.text = ""
+//        actionButton = findViewById(R.id.fab)
+
 
         // 녹음 버튼 행동 설정
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            when (state) {
-                STATE_READY -> onStartRecording()
-                STATE_RECORDING -> onStopRecording()
-                STATE_RECOGNIZING -> {
-                    Log.d(TAG, "음성 인식 중 버튼 눌림. 이 행동은 막아야 함")
-                    Toast.makeText(baseContext, "음성 인식 진행중 입니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+//        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
+//            when (state) {
+//                STATE_READY -> onStartRecording()
+//                STATE_RECORDING -> onStopRecording()
+//                STATE_RECOGNIZING -> {
+//                    Log.d(TAG, "음성 인식 중 버튼 눌림. 이 행동은 막아야 함")
+//                    Toast.makeText(baseContext, "음성 인식 진행중 입니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        }
+    }
+
+    //Android 기본 제공 메서드. 녹음 기능 권한 획득의 결과를 처리하는 콜백
+    override fun onRequestPermissionsResult(
+            requestCode: Int,
+            permissions: Array<String>,
+            grantResults: IntArray
+    ) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        permissionToRecordAccepted = if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+//            grantResults[0] == PackageManager.PERMISSION_GRANTED
+//        } else {
+//            false
+//        }
+//        if (!permissionToRecordAccepted) finish()
+    }
+
+    // 음성 녹음이 시작될 때 해야 하는 일
+    private fun onStartRecording() {
+        showMessage("onStartRecording")
+//        if (isRecording) {
+//            forceStopRecording = true
+//        } else {
+//            state = STATE_RECORDING
+//            actionButton?.setImageResource(R.drawable.ic_baseline_stop_24)
+//            textViewResult?.text = ""
+//
+//            Thread {
+//                // 레코딩 시작
+//                Log.d(TAG, "record start")
+//                recordSpeech()
+//
+//                // 음성 인식 시작
+//                Log.d(TAG, "regognize start")
+//                state = STATE_RECOGNIZING
+//                mainHandler.post {
+//                    textViewState?.text = MESSAGE_RECOGNIZING
+//                }
+//                var recognizedText = recognizeVoice()
+//                if (recognizedText.isNullOrEmpty()) {
+//                    recognizedText = "음성 인식 실패"
+//                }
+//                mainHandler.post {
+//                    textViewResult?.text = recognizedText
+//                    onReady()
+//                }
+//            }.start()
+//        }
+    }
+
+    // 음성 녹음이 중지 될 때 해야 하는 일
+    private fun onStopRecording() {
+        showMessage("onStopRecording")
+//        forceStopRecording = true
+    }
+
+    // 음성 인식이 완료되고 준비 상태가 될 때 해야 하는 일
+    private fun onReady() {
+        showMessage("onReady")
+//        state = STATE_READY
+//        actionButton?.setImageResource(R.drawable.ic_baseline_mic_24)
+//        textViewState?.text = MESSAGE_READY
+    }
+
+    // 음성 녹음하기
+    private fun recordSpeech() {
+        showMessage("recordSpeech")
+//        state = STATE_RECORDING
+//        mainHandler.post {
+//            textViewState?.text = MESSAGE_RECORDING
+//        }
+//
+//        val bufferSize = AudioRecord.getMinBufferSize(
+//            samplingFrequency,
+//            AudioFormat.CHANNEL_IN_MONO,
+//            AudioFormat.ENCODING_PCM_16BIT
+//        )
+//        val audio = AudioRecord(
+//            MediaRecorder.AudioSource.VOICE_RECOGNITION,
+//            samplingFrequency,
+//            AudioFormat.CHANNEL_IN_MONO,
+//            AudioFormat.ENCODING_PCM_16BIT,
+//            bufferSize
+//        )
+//        speechLength = 0
+//        if (audio.state != AudioRecord.STATE_INITIALIZED) {
+//            throw RuntimeException("Error. Failed to initialized audio device. Check the permission.")
+//        } else {
+//            val inBuffer = ShortArray(bufferSize)
+//            forceStopRecording = false
+//            isRecording = true
+//            audio.startRecording()
+//            while (!forceStopRecording) {
+//                val ret = audio.read(inBuffer, 0, bufferSize)
+//                for (i in 0 until ret) {
+//                    if (speechLength >= speechMaxLength) {
+//                        forceStopRecording = true
+//                        break
+//                    }
+//                    speechData[speechLength * 2] = (inBuffer[i].toInt().and(0x00FF)).toByte()
+//                    speechData[speechLength * 2 + 1] =
+//                        (inBuffer[i].toInt().and(0xFF00).shr(8)).toByte()
+//                    speechLength += 1
+//
+//                }
+//            }
+//            audio.stop()
+//            audio.release()
+//            isRecording = false
+//        }
+    }
+
+    // 음성 인식하기.
+    private fun recognizeVoice(): String? {
+        showMessage("recognizeVoice")
+        var recognizedText: String? = null
+
+//        val audioString = Base64.encodeToString(speechData, 0, speechLength * 2, Base64.NO_WRAP)
+//        val requestBody = VoiceRecognitionRequest(
+//            request_id = UUID.randomUUID().toString(),
+//            access_key = etriApiKey,
+//            argument = VoiceRecognitionRequestArgument(
+//                language_code = languageCode,
+//                audio = audioString
+//            )
+//        )
+//        val request = etriService.voiceRecognition(requestBody)
+//        val response = request.execute()
+//        Log.d(TAG, "response code: ${response.code()}")
+//        Log.d(TAG, "response message: ${response.message()}")
+//        Log.d(TAG, "response body: ${response.body()}")
+//        Log.d(TAG, "response error body: ${response.errorBody()?.string()}")
+//        if (response.isSuccessful) {
+//            recognizedText = response.body()?.return_object?.recognized ?: ""
+//        }
+        return recognizedText
     }
 
     // Android 기본 제공 메서드. 우측 상단의 옵션 메뉴 만들기
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
+//        menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     // Android 기본 제공 메서드. 옵션 메뉴의 행동 정의
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_share -> {
-                // 공유 메뉴 행동 정의
-
-                if (textViewResult?.text.isNullOrEmpty()) {
-                    Toast.makeText(baseContext, "음성 인식 결과가 없습니다.", Toast.LENGTH_SHORT).show()
-                } else {
-                    val sendIntent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, textViewResult?.text ?: "")
-                        type = "text/plain"
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
-                    startActivity(shareIntent)
-                }
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+        return true
+//        return when (item.itemId) {
+//            R.id.action_share -> {
+//                // 공유 메뉴 행동 정의
+//
+//                if (textViewResult?.text.isNullOrEmpty()) {
+//                    Toast.makeText(baseContext, "음성 인식 결과가 없습니다.", Toast.LENGTH_SHORT).show()
+//                } else {
+//                    val sendIntent = Intent().apply {
+//                        action = Intent.ACTION_SEND
+//                        putExtra(Intent.EXTRA_TEXT, textViewResult?.text ?: "")
+//                        type = "text/plain"
+//                    }
+//                    val shareIntent = Intent.createChooser(sendIntent, null)
+//                    startActivity(shareIntent)
+//                }
+//                true
+//            }
+//            else -> super.onOptionsItemSelected(item)
+//        }
     }
 
-    // 음성 녹음이 시작될 때 해야 하는 일
-    private fun onStartRecording() {
-        if (isRecording) {
-            forceStopRecording = true
-        } else {
-            state = STATE_RECORDING
-            actionButton?.setImageResource(R.drawable.ic_baseline_stop_24)
-            textViewResult?.text = ""
-
-            Thread {
-                // 레코딩 시작
-                Log.d(TAG, "record start")
-                recordSpeech()
-
-                // 음성 인식 시작
-                Log.d(TAG, "regognize start")
-                state = STATE_RECOGNIZING
-                mainHandler.post {
-                    textViewState?.text = MESSAGE_RECOGNIZING
-                }
-                var recognizedText = recognizeVoice()
-                if (recognizedText.isNullOrEmpty()) {
-                    recognizedText = "음성 인식 실패"
-                }
-                mainHandler.post {
-                    textViewResult?.text = recognizedText
-                    onReady()
-                }
-            }.start()
-        }
-    }
-
-    // 음성 녹음이 중지 될 때 해야 하는 일
-    private fun onStopRecording() {
-        forceStopRecording = true
-    }
-
-    // 음성 인식이 완료되고 준비 상태가 될 때 해야 하는 일
-    private fun onReady() {
-        state = STATE_READY
-        actionButton?.setImageResource(R.drawable.ic_baseline_mic_24)
-        textViewState?.text = MESSAGE_READY
-    }
-
-    // 음성 녹음하기
-    private fun recordSpeech() {
-        Log.d(TAG, "recordSpeech)")
-        state = STATE_RECORDING
+    private fun showMessage(message: String) {
+        Log.d(TAG, message)
         mainHandler.post {
-            textViewState?.text = MESSAGE_RECORDING
-        }
-
-        val bufferSize = AudioRecord.getMinBufferSize(
-            samplingFrequency,
-            AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_16BIT
-        )
-        val audio = AudioRecord(
-            MediaRecorder.AudioSource.VOICE_RECOGNITION,
-            samplingFrequency,
-            AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_16BIT,
-            bufferSize
-        )
-        speechLength = 0
-        if (audio.state != AudioRecord.STATE_INITIALIZED) {
-            throw RuntimeException("Error. Failed to initialized audio device. Check the permission.")
-        } else {
-            val inBuffer = ShortArray(bufferSize)
-            forceStopRecording = false
-            isRecording = true
-            audio.startRecording()
-            while (!forceStopRecording) {
-                val ret = audio.read(inBuffer, 0, bufferSize)
-                for (i in 0 until ret) {
-                    if (speechLength >= speechMaxLength) {
-                        forceStopRecording = true
-                        break
-                    }
-                    speechData[speechLength * 2] = (inBuffer[i].toInt().and(0x00FF)).toByte()
-                    speechData[speechLength * 2 + 1] =
-                        (inBuffer[i].toInt().and(0xFF00).shr(8)).toByte()
-                    speechLength += 1
-
-                }
-            }
-            audio.stop()
-            audio.release()
-            isRecording = false
-        }
-    }
-
-    // 음성 인식하기.
-    private fun recognizeVoice(): String? {
-        Log.d(TAG, "recognizeVoice")
-        val audioString = Base64.encodeToString(speechData, 0, speechLength * 2, Base64.NO_WRAP)
-        val requestBody = VoiceRecognitionRequest(
-            request_id = UUID.randomUUID().toString(),
-            access_key = etriApiKey,
-            argument = VoiceRecognitionRequestArgument(
-                language_code = languageCode,
-                audio = audioString
-            )
-        )
-        val request = etriService.voiceRecognition(requestBody)
-        val response = request.execute()
-        Log.d(TAG, "response code: ${response.code()}")
-        Log.d(TAG, "response message: ${response.message()}")
-        Log.d(TAG, "response body: ${response.body()}")
-        Log.d(TAG, "response error body: ${response.errorBody()?.string()}")
-        if (response.isSuccessful) {
-            val recognizedText = response.body()?.return_object?.recognized ?: ""
-            return recognizedText
-        } else {
-            return null
+            Toast.makeText(baseContext, message, Toast.LENGTH_SHORT).show()
         }
     }
 }
